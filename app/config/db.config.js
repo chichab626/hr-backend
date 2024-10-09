@@ -1,8 +1,8 @@
 module.exports = {
-  HOST: "localhost",
-  USER: "postgres",
-  PASSWORD: "123",
-  DB: "testdb",
+  HOST: "ep-little-glade-a5em3spi.us-east-2.aws.neon.tech",
+  USER: "db1_owner",
+  PASSWORD: "JXREZpaA2g7T",
+  DB: "db1",
   dialect: "postgres",
   pool: {
     max: 5,
