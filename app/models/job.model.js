@@ -13,6 +13,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,        // Maps to VARCHAR in PostgreSQL
         allowNull: false               // Required field
       },
+
       requirements: {
         type: Sequelize.STRING,        // Maps to VARCHAR in PostgreSQL
         allowNull: false               // Required field
