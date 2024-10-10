@@ -8,6 +8,7 @@ module.exports = (sequelize, Sequelize) => {
           key: 'id'
         }
       },
+      // my change
       resume: {
         type: Sequelize.STRING,
         allowNull: false // Link to the candidate's resume
