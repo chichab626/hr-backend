@@ -22,6 +22,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,        // Maps to VARCHAR in PostgreSQL
         allowNull: false               // Required field
       },
+      salary: {
+        type: Sequelize.INTEGER,        // Maps to VARCHAR in PostgreSQL
+        allowNull: false               // Required field
+      },
+      open_positions : {
+        type: Sequelize.INTEGER,        // Maps to VARCHAR in PostgreSQL
+        allowNull: false               // Required field
+      },
       createdAt: {
         type: Sequelize.DATE,          // Maps to TIMESTAMP WITH TIME ZONE in PostgreSQL
         defaultValue: Sequelize.NOW    // Default value set to current date and time
@@ -29,6 +37,8 @@ module.exports = (sequelize, Sequelize) => {
     }, {
       timestamps: false                // Disable default timestamps (createdAt and updatedAt)
     });
+   
+   
   
     return Job;
   };
