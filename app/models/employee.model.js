@@ -27,7 +27,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         salary: {
             type: Sequelize.DECIMAL(10, 2), // Maps to DECIMAL for salary, allows for two decimal places
-            allowNull: false               // Required field
+            allowNull: true               // Required field
         },
         reportsTo: {
             type: Sequelize.INTEGER,       // Use INTEGER to reference another employee's ID
