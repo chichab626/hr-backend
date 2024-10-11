@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
     const Job = sequelize.define("job", {
+
         id: {
             type: Sequelize.INTEGER,       // Define as INTEGER to match PostgreSQL SERIAL
             autoIncrement: true,           // Enable auto-incrementing
@@ -37,6 +38,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DATE,          // Maps to TIMESTAMP WITH TIME ZONE in PostgreSQL
             defaultValue: Sequelize.NOW    // Default value set to current date and time
         }
+
     }, {
         timestamps: false                // Disable default timestamps (createdAt and updatedAt)
     });
