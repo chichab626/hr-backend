@@ -40,7 +40,7 @@ exports.create = (req, res) => {
         .catch(err => {
             res.status(500).send({
                 message:
-                    err.message || "Some error occurred while creating the job."
+                    err.message || "Some error occurred while creating the Job."
             });
         });
 };
@@ -50,7 +50,7 @@ exports.findAll = (req, res) => {
     const title = req.query.title;
     var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
 
-    job.findAll({ where: condition })
+    Job.findAll({ where: condition })
         .then(data => {
             res.send(data);
         })
@@ -66,7 +66,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    job.findByPk(id)
+    Job.findByPk(id)
         .then(data => {
             res.send(data);
         })
@@ -81,7 +81,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     const id = req.params.id;
 
-    job.update(req.body, {
+    Job.update(req.body, {
         where: { id: id }
     })
         .then(num => {
@@ -106,7 +106,7 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     const id = req.params.id;
 
-    job.destroy({
+    Job.destroy({
         where: { id: id }
     })
         .then(num => {
@@ -129,7 +129,7 @@ exports.delete = (req, res) => {
 
 // Delete all jobs from the database.
 exports.deleteAll = (req, res) => {
-    job.destroy({
+    Job.destroy({
         where: {},
         truncate: false
     })
@@ -146,7 +146,7 @@ exports.deleteAll = (req, res) => {
 
 // find all published job
 exports.findAllPublished = (req, res) => {
-    job.findAll({ where: { published: true } })
+    Job.findAll({ where: { published: true } })
         .then(data => {
             res.send(data);
         })

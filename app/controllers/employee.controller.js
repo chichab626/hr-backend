@@ -35,8 +35,8 @@ exports.create = (req, res) => {
 
 // Retrieve all employees from the database.
 exports.findAll = (req, res) => {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
+    const notId = req.query.notId;
+    var condition = notId ? { id: { [Op.ne]: notId } } : null;
 
     Employee.findAll({ where: condition })
         .then(data => {
