@@ -36,7 +36,9 @@ exports.create = (req, res) => {
 // Retrieve all employees from the database.
 exports.findAll = (req, res) => {
     const notId = req.query.notId;
+    const userId = req.query.userId;
     var condition = notId ? { id: { [Op.ne]: notId } } : null;
+    condition = userId ? { userId: { [Op.eq]: userId } } : null;
 
     Employee.findAll({ where: condition })
         .then(data => {
@@ -50,7 +52,7 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a single User with an id
+// Find a single Employee with an id or userId
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
