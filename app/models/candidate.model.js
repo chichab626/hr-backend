@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         resume: {
             type: Sequelize.TEXT,
-            allowNull: false // Link to the candidate's resume
+            allowNull: true // Link to the candidate's resume
         },
         name: { // New field for candidate's name
             type: Sequelize.STRING,
@@ -18,23 +18,31 @@ module.exports = (sequelize, Sequelize) => {
         },
         email: { // New field for candidate's email
             type: Sequelize.STRING,
-            allowNull: false, // Making email required
+            allowNull: true, 
             validate: {
                 isEmail: true // Validates that the input is a valid email format
-            }
+            },
+            unique: true
         },
         phone: { // New field for candidate's phone number
             type: Sequelize.STRING,
             allowNull: false // Making phone required
         },
-
+        profileSummary: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
         externalEmail: {
             type: Sequelize.STRING,
-            allowNull: false // External email during the application process
+            allowNull: true, // External email during the application process
+            validate: {
+                isEmail: true // Validates that the input is a valid email format
+            },
+            unique: true
         },
         status: {
-            type: Sequelize.ENUM('Applied', 'Shortlisted', 'Interviewed', 'Rejected', 'Hired'), // Status of the candidate's application
-            defaultValue: 'Applied' // Default value set to 'Applied'
+            type: Sequelize.ENUM('Added','Applied', 'Shortlisted', 'Interviewed', 'Rejected', 'Hired'), // Status of the candidate's application
+            defaultValue: 'Added'
         },
         createdAt: {
             type: Sequelize.DATE,
@@ -42,7 +50,11 @@ module.exports = (sequelize, Sequelize) => {
         },
         experiences: {
             type: Sequelize.ARRAY(Sequelize.JSON) // Store an array of experiences with rich text
-        }
+        },
+        location: {
+            type: Sequelize.STRING,        // Maps to VARCHAR for location
+            allowNull: true               // Required field
+        },
     }, {
         timestamps: false // Disable Sequelize's automatic timestamps if not needed
     });

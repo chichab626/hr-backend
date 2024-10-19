@@ -49,8 +49,11 @@ exports.create = async (req, res) => {
     
         console.log('Transaction has been committed!');
         res.send({ user, employee})
-      } catch (error) {
-        console.error('Transaction failed and has been rolled back:', error);
+      } catch (err) {
+        res.status(500).send({
+            message: err.parent?.detail || err.message ||  "Transaction failed and has been rolled back"
+        });
+        console.error('Transaction failed and has been rolled back:', err);
       }
 };
 

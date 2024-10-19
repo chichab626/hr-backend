@@ -1,28 +1,28 @@
 module.exports = app => {
-  const applicant = require("../controllers/applicant.controller.js");
+    const applicant = require("../controllers/applicant.controller.js");
 
-  var router = require("express").Router();
+    var router = require("express").Router();
 
-  // Create a new applicant
-  router.post("/", applicants.create);
+    // Route for bulk upsert
+    router.post('/bulk-upsert', applicants.bulkUpsert);
 
-  // Retrieve all applicants
-  router.get("/", applicants.findAll);
+    // Create a new applicant
+    router.post("/", applicants.create);
 
-  // Retrieve all published applicants
-  router.get("/published", applicants.findAllPublished);
+    // Retrieve all applicants
+    router.get("/", applicants.findAll);
 
-  // Retrieve a single applicant with id
-  router.get("/:id", applicants.findOne);
+    // Retrieve a single applicant with id
+    router.get("/:id", applicants.findOne);
 
-  // Update a applicant with id
-  router.put("/:id", applicants.update);
+    // Update a applicant with id
+    router.put("/:id", applicants.update);
 
-  // Delete a applicant with id
-  router.delete("/:id", applicants.delete);
+    // Delete a applicant with id
+    router.delete("/:id", applicants.delete);
 
-  // Delete all applicants
-  router.delete("/", applicants.deleteAll);
+    // Delete all applicants
+    router.delete("/", applicants.deleteAll);
 
-  app.use("/api/applicants", router);
+    app.use("/api/applicants", router);
 };
