@@ -20,6 +20,9 @@ module.exports = app => {
   
     // Delete all Candidates
     router.delete("/", candidates.deleteAll);
+
+    //bulk hire
+    router.post("/bulk-hire", candidates.bulkHire);
   
   
     app.use("/api/candidates", router);

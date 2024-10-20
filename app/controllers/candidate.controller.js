@@ -36,8 +36,8 @@ exports.create = (req, res) => {
 
 // Retrieve all Candidates
 exports.findAll = (req, res) => {
-  const name = req.query.name;
-  const condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  const notHired = req.query.notHired;
+  const condition = notHired === 'true' ? { status: { [Op.ne]: 'Hired' } } : null;
 
   Candidate.findAll({ where: condition })
     .then(data => {
@@ -70,6 +70,46 @@ exports.findOne = (req, res) => {
       });
     });
 };
+
+// Bulk update Candidates' interview status to "Hired"
+exports.bulkHire = async (req, res) => {
+    const candidateIds = req.body.candidateIds; // Expecting an array of candidate IDs in the request body
+
+    if (!Array.isArray(candidateIds) || candidateIds.length === 0) {
+        return res.status(400).send({
+            message: "Invalid request. Please provide an array of candidate IDs."
+        });
+    }
+
+    try {
+        const [updatedCount] = await Candidate.update(
+            { status: 'Hired' }, // New status
+            {
+                where: {
+                    id: candidateIds // Update where candidate ID is in the provided array
+                }
+            }
+        );
+
+        // Check if any records were updated
+        if (updatedCount === 0) {
+            return res.status(200).send({
+                message: "No candidates found with the provided IDs."
+            });
+        }
+
+        res.status(200).send({
+            message: "Bulk update to 'Hired' completed successfully.",
+            updatedCount // Return the count of updated candidates
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Some error occurred while performing bulk update."
+        });
+    }
+};
+
 
 // Update a Candidate by the id in the request
 exports.update = (req, res) => {

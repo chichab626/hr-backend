@@ -1,10 +1,14 @@
 module.exports = app => {
-    const applicant = require("../controllers/applicant.controller.js");
+    const applicants = require("../controllers/applicant.controller.js");
 
     var router = require("express").Router();
 
     // Route for bulk upsert
     router.post('/bulk-upsert', applicants.bulkUpsert);
+    router.post('/bulk-hire', applicants.bulkHireAndWithdraw);
+
+        // Route for bulk upsert
+        router.post('/bulk-delete', applicants.bulkDelete);
 
     // Create a new applicant
     router.post("/", applicants.create);
@@ -21,8 +25,7 @@ module.exports = app => {
     // Delete a applicant with id
     router.delete("/:id", applicants.delete);
 
-    // Delete all applicants
-    router.delete("/", applicants.deleteAll);
+    router.post("/bulk-reset", applicants.bulkUpdateInterviewStatus)
 
     app.use("/api/applicants", router);
 };

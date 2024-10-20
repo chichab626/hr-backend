@@ -1,6 +1,8 @@
 const db = require("../models");
 const Job = db.jobs;
+const JobApplicant = db.jobApplicants;
 const Op = db.Sequelize.Op;
+const sequelize = db.Sequelize
 
 // Create and Save a new job
 exports.create = (req, res) => {
@@ -44,22 +46,37 @@ exports.create = (req, res) => {
         });
 };
 
-// Retrieve all jobs from the database.
-exports.findAll = (req, res) => {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
 
-    Job.findAll({ where: condition })
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving jobs."
-            });
+
+exports.findAll = async (req, res) => {
+    const applicants = req.query.applicants === 'true';
+
+    try {
+        const jobs = await Job.findAll({
+            //where: condition, // Define your filtering condition if any
+            include: applicants ? [{ 
+                model: JobApplicant, 
+                as: 'jobApplicant', 
+                attributes: [], // Don't include the entire applicant details, just count
+                required: false // Use LEFT JOIN instead of INNER JOIN
+            }] : [],
+            attributes: {
+                include: applicants ? [
+                    [sequelize.fn('COUNT', sequelize.col('jobApplicant.id')), 'applicantCount']
+                ] : []
+            },
+            group: ['job.id'] // Group by Job ID to allow counting
         });
+
+        res.status(200).send(jobs);
+    } catch (err) {
+        console.error(err)
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving jobs."
+        });
+    }
 };
+
 
 // Find a single job with an id
 exports.findOne = (req, res) => {
