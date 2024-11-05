@@ -40,6 +40,7 @@ require("./app/routes/employee.routes")(app);
 require("./app/routes/job.routes")(app);
 require("./app/routes/candidate.routes")(app);
 require("./app/routes/applicant.routes")(app);
+require("./app/routes/checklist.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

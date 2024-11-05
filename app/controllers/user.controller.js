@@ -1,6 +1,8 @@
 const db = require("../models");
 const User = db.users;
 const Employee = db.employees;
+const Candidate = db.candidates;
+const Checklist = db.checklist
 const Op = db.Sequelize.Op;
 const sequelize = db.sequelize
 
@@ -9,7 +11,7 @@ exports.create = async (req, res) => {
 
     const {
         email, password, role,
-        name, jobTitle, location, salary, reportsTo
+        name, jobTitle, location, salary, reportsTo, externalEmail, candidateId
     } = req.body;
 
     // Validate request
@@ -21,7 +23,7 @@ exports.create = async (req, res) => {
     }
 
     try {
-        let employee, user = {}
+        let candidate, employee, user, checklist = {}
         await sequelize.transaction(async (t) => {
           user = await User.create(
             { email, password, role },
@@ -43,12 +45,24 @@ exports.create = async (req, res) => {
                 },
                 { transaction: t }
               );
+            
+              if (candidateId && externalEmail) {
+                candidate = await Candidate.update( { status : "Employee"}, {  where: { id :  candidateId} }, { transaction: t })
+
+                checklist = await Checklist.create( {
+                    employeeId : employee.id, 
+                    status: 'Added',
+                    hireDate:  new Date(),
+                },
+                { transaction: t })
+              };
+            
           }
     
         });
     
         console.log('Transaction has been committed!');
-        res.send({ user, employee})
+        res.send({ user, employee, candidate, checklist})
       } catch (err) {
         res.status(500).send({
             message: err.parent?.detail || err.message ||  "Transaction failed and has been rolled back"

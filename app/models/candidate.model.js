@@ -41,7 +41,7 @@ module.exports = (sequelize, Sequelize) => {
             unique: true
         },
         status: {
-            type: Sequelize.ENUM('Added','Applied', 'Shortlisted', 'Interviewed', 'Rejected', 'Hired'), // Status of the candidate's application
+            type: Sequelize.ENUM('Employee', 'Added', 'Hired'), // Status of the candidate's application
             defaultValue: 'Added'
         },
         createdAt: {

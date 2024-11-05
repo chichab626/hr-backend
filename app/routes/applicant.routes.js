@@ -7,8 +7,11 @@ module.exports = app => {
     router.post('/bulk-upsert', applicants.bulkUpsert);
     router.post('/bulk-hire', applicants.bulkHireAndWithdraw);
 
-        // Route for bulk upsert
-        router.post('/bulk-delete', applicants.bulkDelete);
+    // Route for bulk delete
+    router.post('/bulk-delete', applicants.bulkDelete);
+
+    // route for finding the job application candidate was hired for
+    router.get('/find-hired-job/:candidateId', applicants.findJobApplicationByCandidate);
 
     // Create a new applicant
     router.post("/", applicants.create);
@@ -25,7 +28,7 @@ module.exports = app => {
     // Delete a applicant with id
     router.delete("/:id", applicants.delete);
 
-    router.post("/bulk-reset", applicants.bulkUpdateInterviewStatus)
+    router.post("/bulk-reset", applicants.bulkUpdateInterviewStatus);
 
     app.use("/api/applicants", router);
 };

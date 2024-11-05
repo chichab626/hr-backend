@@ -15,7 +15,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     min: dbConfig.pool.min,
     acquire: dbConfig.pool.acquire,
     idle: dbConfig.pool.idle
-  }
+  },
+  logging: console.log 
 });
 
 const db = {};
@@ -29,8 +30,12 @@ db.jobs = require("./job.model.js")(sequelize, Sequelize);
 db.candidates = require("./candidate.model.js")(sequelize, Sequelize);
 db.employees = require("./employee.model.js")(sequelize, Sequelize);
 db.jobApplicants = require("./applicant.model.js")(sequelize, Sequelize);
+db.checklist = require("./checklist.model.js")(sequelize, Sequelize);
 
 db.jobs.hasMany(db.jobApplicants, { foreignKey: 'jobId', as: 'jobApplicant' });
 db.jobApplicants.associate({Candidate:db.candidates, Job:db.jobs})
+
+db.employees.hasMany(db.checklist, { foreignKey: 'employeeId', as: 'checklist' })
+db.checklist.belongsTo(db.employees, { foreignKey: 'employeeId', as: 'employee'})
 
 module.exports = db;

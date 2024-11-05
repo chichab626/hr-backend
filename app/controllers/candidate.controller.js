@@ -16,6 +16,7 @@ exports.create = (req, res) => {
   const candidate = {
     name: req.body.name,
     externalEmail: req.body.email,
+    email: req.body.email,
     location: req.body.location,
     phone: req.body.phone,
     profileSummary: req.body.profileSummary,
@@ -122,7 +123,7 @@ exports.update = (req, res) => {
       if (num == 1) {
         res.send({
           message: "Candidate was updated successfully."
-        });
+        });y
       } else {
         res.send({
           message: `Cannot update Candidate with id=${id}. Maybe Candidate was not found or req.body is empty!`
@@ -130,6 +131,7 @@ exports.update = (req, res) => {
       }
     })
     .catch(err => {
+        console.log(err)
       res.status(500).send({
         message: "Error updating Candidate with id=" + id
       });

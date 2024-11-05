@@ -100,6 +100,42 @@ exports.bulkHireAndWithdraw = async (req, res) => {
     }
 };
 
+// Retrieve the job application where the candidate was hired
+exports.findJobApplicationByCandidate = async (req, res) => {
+    const { candidateId } = req.params;
+
+    if (!candidateId) {
+        return res.status(400).send({ message: "Candidate ID is required." });
+    }
+
+    try {
+        // Fetch the job application where the candidate was hired
+        const hiredApplication = await JobApplicant.findOne({
+            where: {
+                candidateId,
+                interviewStatus: 'Hired' // Only retrieve if the candidate was hired
+            },
+            include: [
+                { model: Job, as: 'job' },
+                { model: Candidate, as: 'candidate' }
+            ]
+        });
+
+        // Check if the hired job application was found
+        if (!hiredApplication) {
+            return res.status(404).send({ message: "No hired job application found for this candidate." });
+        }
+
+        res.status(200).send(hiredApplication);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Some error occurred while retrieving the hired job application for the candidate."
+        });
+    }
+};
+
+
 
 // Delete multiple job applications
 exports.bulkDelete = async (req, res) => {
@@ -273,7 +309,9 @@ exports.bulkUpdateInterviewStatus = async (req, res) => {
             { status: 'Added' }, // New status
             {
                 where: {
-                    status: 'Hired' // Only update if currently hired
+                    status: {
+                        [Op.or]: ['Hired', 'Employee'] // Update if status is 'Hired' or 'Employee'
+                    }
                 }
             }
         );
