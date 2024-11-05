@@ -11,7 +11,7 @@ exports.create = async (req, res) => {
 
     const {
         email, password, role,
-        name, jobTitle, location, salary, reportsTo, externalEmail, candidateId
+        name, jobTitle, location, salary, reportsTo, externalEmail, candidateId, jobId
     } = req.body;
 
     // Validate request
@@ -51,6 +51,7 @@ exports.create = async (req, res) => {
 
                 checklist = await Checklist.create( {
                     employeeId : employee.id, 
+                    jobId: jobId,
                     status: 'Added',
                     hireDate:  new Date(),
                 },

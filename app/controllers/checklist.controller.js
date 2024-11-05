@@ -88,15 +88,13 @@ exports.findOne = (req, res) => {
 // Update a checklist by the id in the request
 exports.update = (req, res) => {
     const id = req.params.id;
-
-    Checklist.update(req.body, {
+console.log(req.params)
+    const checklist = Checklist.update(req.body, {
         where: { id: id }
     })
         .then(num => {
             if (num == 1) {
-                res.send({
-                    message: "checklist was updated successfully."
-                });
+                res.send(checklist);
             } else {
                 res.send({
                     message: `Cannot update checklist with id=${id}. Maybe checklist was not found or req.body is empty!`
@@ -104,6 +102,7 @@ exports.update = (req, res) => {
             }
         })
         .catch(err => {
+            console.log(err)
             res.status(500).send({
                 message: "Error updating checklist with id=" + id
             });

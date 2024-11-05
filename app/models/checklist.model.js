@@ -8,6 +8,14 @@ module.exports = (sequelize, Sequelize) => {
                 key: 'id'
             }
         },
+        jobId: {
+            type: Sequelize.INTEGER, // Treference the Employee model by its primary key 
+            allowNull: true,
+            references: {
+                model: 'jobs', // Reference to Employee model 
+                key: 'id'
+            }
+        },
         status: {
             type: Sequelize.ENUM('Complete', 'Added', 'In-Progress'), // Match with the ENUM in SQL
             allowNull: false
@@ -28,6 +36,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DATE
         },
         trainingDate: {
+            type: Sequelize.DATE
+        },
+        startDate: {
             type: Sequelize.DATE
         }
     });
