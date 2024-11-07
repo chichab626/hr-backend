@@ -31,6 +31,7 @@ db.candidates = require("./candidate.model.js")(sequelize, Sequelize);
 db.employees = require("./employee.model.js")(sequelize, Sequelize);
 db.jobApplicants = require("./applicant.model.js")(sequelize, Sequelize);
 db.checklist = require("./checklist.model.js")(sequelize, Sequelize);
+db.letter = require("./letter.model.js")(sequelize, Sequelize);
 
 db.jobs.hasMany(db.jobApplicants, { foreignKey: 'jobId', as: 'jobApplicant' });
 db.jobApplicants.associate({Candidate:db.candidates, Job:db.jobs})
