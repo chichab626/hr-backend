@@ -42,7 +42,8 @@ module.exports = (sequelize, Sequelize) => {
         },
         status: {
             type: Sequelize.ENUM('Employee', 'Added', 'Hired'), // Status of the candidate's application
-            defaultValue: 'Added'
+            defaultValue: 'Added',
+            allowNull: false
         },
         createdAt: {
             type: Sequelize.DATE,

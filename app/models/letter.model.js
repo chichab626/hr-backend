@@ -53,15 +53,19 @@ module.exports = (sequelize, Sequelize) => {
             }
         },
         status: {
-            type: Sequelize.ENUM('Created', 'Sent'), 
-            defaultValue: 'Created'
+            type: Sequelize.ENUM('Draft', 'Sent', 'Archived'), 
+            defaultValue: 'Draft'
         },
         type: {
-            type: Sequelize.ENUM('Rejection', 'Appointment', 'Promotion'), 
+            type: Sequelize.ENUM('Rejection', 'Job Offer', 'Onboarding', 'Promotion'), 
+            allowNull: true,
+        },
+        sentAt: {
+            type: Sequelize.DATE,
             allowNull: true,
         },
         createdAt: {
-            type: Sequelize.DATE,          // Maps to TIMESTAMP WITH TIME ZONE in PostgreSQL
+            type: Sequelize.DATE,
             defaultValue: Sequelize.NOW    // Default value set to current date and time
         }
 

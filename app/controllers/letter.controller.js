@@ -1,9 +1,125 @@
+const fs = require('fs');
+const Mustache = require('mustache');
+const path = require('path');
 const db = require("../models");
-const Letter = db.letters;
+const Letter = db.letter;
 const Candidate = db.candidates;
 const Employee = db.employees;
 const Op = db.Sequelize.Op;
 const sequelize = db.sequelize;
+
+//Bulk reject applicants
+exports.bulkReject = async (req, res) => {
+    const { applicants, jobTitle } = req.body;
+
+    const templatePath = path.join(__dirname, '../templates/rejection.html');
+    let template;
+    try {
+        template = fs.readFileSync(templatePath, 'utf8');
+    } catch (err) {
+        res.status(500).send({
+            message: "Failed to load the rejection template"
+        });
+        return;
+    }
+
+    const letters = [];
+    try {
+        for (const applicant of applicants) {
+            const message = Mustache.render(template, {
+                name: applicant.name,
+                jobTitle
+            });
+
+            const letter = await Letter.create({
+                candidateId: applicant.candidateId,
+                jobId: applicant.jobId,
+                subject: `Application for ${jobTitle} position`,
+                message,
+                toEmail: applicant.email,
+                fromEmail: "hiring@company.com",
+                status: 'Draft',
+                type: 'Rejection'
+            });
+
+            letters.push(letter);
+        }
+
+        res.send({ message: "Rejection letters created successfully", letters });
+    } catch (err) {
+        res.status(500).send({
+            message: err.message || "Failed to create rejection letters"
+        });
+    }
+};
+
+exports.bulkCreateLetters = async (req, res) => {
+    const { applicants, jobTitle, letterType } = req.body;
+
+    // Determine template path based on letter type
+    let templatePath;
+    switch (letterType) {
+        case 'Rejection':
+            templatePath = path.join(__dirname, '../templates/rejection.html');
+            break;
+        case 'Job Offer':
+            templatePath = path.join(__dirname, '../templates/offer.html');
+            break;
+        case 'Onboarding':
+            templatePath = path.join(__dirname, '../templates/onboarding.html');
+            break;
+        default:
+            res.status(400).send({ message: "Invalid letter type specified." });
+            return;
+    }
+
+    // Load the appropriate template
+    let template;
+    try {
+        template = fs.readFileSync(templatePath, 'utf8');
+    } catch (err) {
+        res.status(500).send({
+            message: `Failed to load the ${letterType} template`
+        });
+        return;
+    }
+
+    const letters = [];
+    try {
+        for (const applicant of applicants) {
+            // Render the message using the Mustache template
+            const message = Mustache.render(template, {
+                name: applicant.name,
+                jobTitle,
+                nextInterview: applicant.nextInterview,
+                // for onboarding
+                companyEmail: applicant.companyEmail,
+                password: applicant.password
+            });
+
+            // Create a new letter in the database
+            const letter = await Letter.create({
+                candidateId: applicant.candidateId,
+                jobId: applicant.jobId,
+                subject: `${letterType} for ${jobTitle} position`,
+                message,
+                toEmail: applicant.email,
+                fromEmail: "hiring@company.com",
+                status: 'Draft',
+                type: letterType,
+
+            });
+
+            letters.push(letter);
+        }
+
+        res.send({ message: `${letterType} letters created successfully`, letters });
+    } catch (err) {
+        res.status(500).send({
+            message: err.message || `Failed to create ${letterType} letters`
+        });
+    }
+};
 
 // Create and Save a new Letter
 exports.create = async (req, res) => {

@@ -23,6 +23,8 @@ module.exports = app => {
   
     // Delete all Letters
     router.delete("/", letters.deleteAll);
+
+    router.post("/draft-letters", letters.bulkCreateLetters);
   
     app.use("/api/letters", router);
   };
