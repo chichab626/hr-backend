@@ -4,10 +4,11 @@ const cors = require("cors");
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:3000"
+  origin: ["http://localhost:3000", "https://improved-lamp-7v59jppv794cx944-3000.app.github.dev"]
 };
 
 app.use(cors(corsOptions));
+
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -42,6 +43,7 @@ require("./app/routes/candidate.routes")(app);
 require("./app/routes/applicant.routes")(app);
 require("./app/routes/checklist.routes")(app);
 require("./app/routes/letter.routes")(app);
+require("./app/routes/auth.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
