@@ -60,7 +60,7 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.ENUM('Rejection', 'Job Offer', 'Onboarding', 'Promotion'), 
             allowNull: true,
         },
-        sentAt: {
+        dateSent: {
             type: Sequelize.DATE,
             allowNull: true,
         },
