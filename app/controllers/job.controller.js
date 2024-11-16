@@ -50,10 +50,11 @@ exports.create = (req, res) => {
 
 exports.findAll = async (req, res) => {
     const applicants = req.query.applicants === 'true';
+    const condition = req.query.managerId ? { hiringManagerId: { [Op.eq]: req.query.managerId } } : null
 
     try {
         const jobs = await Job.findAll({
-            //where: condition, // Define your filtering condition if any
+            where: condition, 
             include: applicants ? [{ 
                 model: JobApplicant, 
                 as: 'jobApplicant', 

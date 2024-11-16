@@ -38,6 +38,7 @@ exports.findAll = (req, res) => {
     const userId = req.query.userId;
     var condition = notId ? { id: { [Op.ne]: notId } } : null;
     condition = userId ? { userId: { [Op.eq]: userId } } : null;
+    condition = 'managers' in req.query ? { jobTitle: { [Op.iLike]: `%Manager%` } } : null;
 
     Employee.findAll({ where: condition })
         .then(data => {

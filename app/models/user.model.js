@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false
       },
       role: {
-        type: Sequelize.ENUM('HRManager', 'Employee', 'Administrator'), // Match with the ENUM in SQL
+        type: Sequelize.ENUM('HR', 'Employee', 'Administrator'), // Match with the ENUM in SQL
         allowNull: false
       },
       createdAt: {
