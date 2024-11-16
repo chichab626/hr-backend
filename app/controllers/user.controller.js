@@ -46,21 +46,25 @@ exports.create = async (req, res) => {
                 { transaction: t }
               );
             
-              if (candidateId && externalEmail) {
-                candidate = await Candidate.update( { status : "Employee"}, {  where: { id :  candidateId} }, { transaction: t })
-
-                checklist = await Checklist.create( {
-                    employeeId : employee.id, 
-                    jobId: jobId,
-                    status: 'Added',
-                    hireDate:  new Date(),
-                },
-                { transaction: t })
-              };
-            
           }
+
+          if (candidateId && externalEmail) {           
+
+            checklist = await Checklist.create( {
+                employeeId : employee.id, 
+                jobId: jobId,
+                status: 'Added',
+                hireDate:  new Date(),
+            },
+            { transaction: t })
+        };
     
         });
+
+        if (candidateId && externalEmail) {
+            candidate = await Candidate.update( { status : "Employee", userId: user.id, email: email}, {  where: { id :  candidateId} })
+
+        };
     
         console.log('Transaction has been committed!');
         res.send({ user, employee, candidate, checklist})

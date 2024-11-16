@@ -52,7 +52,7 @@ exports.bulkHireAndWithdraw = async (req, res) => {
         await Promise.all(jobApplications.map(async (application) => {
             // Update the job application to 'Hired'
             const [updatedCount, updatedRows] = await JobApplicant.update(
-                { interviewStatus: 'Hired' },
+                { interviewStatus: 'Hired', appliedAt : new Date() },
                 {
                     where: {
                         candidateId: application.candidateId,
@@ -135,7 +135,87 @@ exports.findJobApplicationByCandidate = async (req, res) => {
     }
 };
 
+// Retrieve the job applications of candidate
+exports.findJobApplications = async (req, res) => {
+    let { candidateId, email} = req.query;
 
+    if (!candidateId && !email) {
+        return res.status(400).send({ message: "Candidate ID or email required." });
+    }
+
+    try {
+        // if candidateId is not present use email in the query
+        if (!candidateId) {
+            const candidate = await Candidate.findOne({ where: { email } });
+            if (!candidate) {
+                return res.status(404).send({ message: "Candidate not found." });
+            }
+            candidateId = candidate.id;
+        }
+        // Fetch the job application where the candidate was hired
+        const applications = await JobApplicant.findAll({
+            where: {
+                candidateId
+            },
+            // include: [
+            //     { model: Job, as: 'job' },
+            //     { model: Candidate, as: 'candidate' }
+            // ]
+        });
+
+        res.status(200).send(applications);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Some error occurred while retrieving the hired job application for the candidate."
+        });
+    }
+};
+
+
+// Create a job application for a candidate
+exports.applyToJob = async (req, res) => {
+    const { jobId, email } = req.body;
+
+    if (!jobId || !email) {
+        return res.status(400).send({
+            message: "Both jobId and email are required.",
+        });
+    }
+
+    try {
+        // Find the candidate by email
+        const candidate = await Candidate.findOne({ where: { email: email } });
+
+        if (!candidate) {
+            return res.status(404).send({ message: "Candidate not found for the provided email." });
+        }
+
+        // Check if the job exists
+        const job = await Job.findByPk(jobId);
+        if (!job) {
+            return res.status(404).send({ message: "Job not found." });
+        }
+
+        // Create the job application
+        const jobApplication = await JobApplicant.upsert({
+            candidateId: candidate.id,
+            jobId: job.id,
+            interviewStatus: "Not Interviewed", // Default status
+            appliedAt: new Date(),
+        }, {
+            returning: true,
+            conflictFields: ['candidateId', 'jobId']
+        });
+
+        res.status(201).send(jobApplication[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "An error occurred while creating the job application.",
+        });
+    }
+};
 
 // Delete multiple job applications
 exports.bulkDelete = async (req, res) => {
@@ -306,7 +386,7 @@ exports.bulkUpdateInterviewStatus = async (req, res) => {
         );
 
         const [candidateCount] = await Candidate.update(
-            { status: 'Added' }, // New status
+            { status: 'Added', userId : null }, // New status
             {
                 where: {
                     status: {

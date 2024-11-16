@@ -12,9 +12,11 @@ module.exports = app => {
 
     // route for finding the job application candidate was hired for
     router.get('/find-hired-job/:candidateId', applicants.findJobApplicationByCandidate);
+    router.get('/find-applications', applicants.findJobApplications);
 
     // Create a new applicant
     router.post("/", applicants.create);
+    router.post("/apply", applicants.applyToJob);
 
     // Retrieve all applicants
     router.get("/", applicants.findAll);
