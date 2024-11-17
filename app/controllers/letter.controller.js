@@ -54,7 +54,7 @@ exports.bulkReject = async (req, res) => {
 };
 
 exports.bulkCreateLetters = async (req, res) => {
-    const { applicants, jobTitle, letterType } = req.body;
+    const { applicants, jobTitle, letterType, from } = req.body;
 
     // Determine template path based on letter type
     let templatePath;
@@ -67,6 +67,9 @@ exports.bulkCreateLetters = async (req, res) => {
             break;
         case 'Onboarding':
             templatePath = path.join(__dirname, '../templates/onboarding.html');
+            break;
+        case 'New Hire':
+            templatePath = path.join(__dirname, '../templates/hire_notification.html');
             break;
         default:
             res.status(400).send({ message: "Invalid letter type specified." });
@@ -92,22 +95,34 @@ exports.bulkCreateLetters = async (req, res) => {
                 name: applicant.name,
                 jobTitle,
                 nextInterview: applicant.nextInterview,
-                // for onboarding
+                // Specific fields for onboarding and IT notifications
                 companyEmail: applicant.companyEmail,
-                password: applicant.password
+                password: applicant.password,
+                email: applicant.email // used in IT notifications
             });
+
+            // Determine the recipient based on letter type
+            const toEmail =
+                letterType === 'New Hire' ? 'admin@company.com' : applicant.email;
 
             // Create a new letter in the database
             const letter = await Letter.create({
                 candidateId: applicant.candidateId,
                 jobId: applicant.jobId,
-                subject: `${letterType} for ${jobTitle} position`,
+                subject:
+                    letterType === 'New Hire'
+                        ? `Account Setup Required for ${applicant.name}`
+                        : `${letterType} for ${jobTitle} position`,
                 message,
-                toEmail: applicant.email,
-                fromEmail: "hiring@company.com",
-                status: 'Draft',
+                toEmail,
+                fromEmail: from || "hr@company.com",
+                status: letterType === 'New Hire'
+                    ? `Sent`
+                    : `Draft`,
                 type: letterType,
-
+                dateSent: letterType === 'New Hire'
+                    ? new Date()
+                    : null,
             });
 
             letters.push(letter);
@@ -120,6 +135,7 @@ exports.bulkCreateLetters = async (req, res) => {
         });
     }
 };
+
 
 // Create and Save a new Letter
 exports.create = async (req, res) => {
@@ -154,8 +170,17 @@ exports.create = async (req, res) => {
 
 // Retrieve all Letters from the database.
 exports.findAll = (req, res) => {
-    const subject = req.query.subject;
-    var condition = subject ? { subject: { [Op.iLike]: `%${subject}%` } } : null;
+    const email = req.query.email;
+    const externalEmail = req.query.externalEmail;
+    const condition = email || externalEmail
+        ? {
+            [Op.or]: [
+                { toEmail: { [Op.eq]: email } },
+                { fromEmail: { [Op.eq]: email } },
+                { toEmail: { [Op.eq]: externalEmail } }
+            ]
+        }
+        : null;
 
     Letter.findAll({ where: condition })
         .then(data => {

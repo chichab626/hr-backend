@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../models');
 const User = db.users;
 const Employee = db.employees;
+const Candidate = db.candidates;
 
 // Secret key for JWT (store in environment variables in production)
 const JWT_SECRET = 'your-super-secret-key';
@@ -28,10 +29,13 @@ exports.login = async (req, res) => {
     }
 
     let result =  { user , email: user.email }
-    let employee = null;
+    let employee, candidate = null;
     if (user.role == 'Employee') {
         employee = await Employee.findOne({ where: { userId: user.id } });
+        candidate = await Candidate.findOne({ where: { userId: user.id } });
         result.employeeId = employee.id;
+        result.candidate = candidate || {};
+        result.employee = employee || {};
     }
 
     const role = (user.role == 'Employee' && employee?.jobTitle?.includes('Manager')) ? 'Manager' : user.role

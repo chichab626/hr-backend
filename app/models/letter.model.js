@@ -57,7 +57,7 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: 'Draft'
         },
         type: {
-            type: Sequelize.ENUM('Rejection', 'Job Offer', 'Onboarding', 'Promotion'), 
+            type: Sequelize.ENUM('Rejection', 'Job Offer', 'Onboarding', 'Promotion', 'New Hire'), 
             allowNull: true,
         },
         dateSent: {

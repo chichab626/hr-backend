@@ -18,18 +18,18 @@ exports.create = (req, res) => {
     }
 
     Employee.create({
-        userId, name, email, jobTitle, location, 
-        ... (salary && { salary } ),
-        ... (reportsTo && { reportsTo } ),
+        userId, name, email, jobTitle, location,
+        ... (salary && { salary }),
+        ... (reportsTo && { reportsTo }),
     })
-    .then(data => {
-        res.send(data);
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: err.parent?.detail || err.message ||  "Some error occurred while creating the User."
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.parent?.detail || err.message || "Some error occurred while creating the User."
+            });
         });
-    });
 };
 
 // Retrieve all employees from the database.
@@ -67,13 +67,18 @@ exports.findOne = (req, res) => {
         });
 };
 
-// Update a User by the id in the request
-exports.update = (req, res) => {
-    const id = req.params.id;
 
-    Employee.update(req.body, {
-        where: { id: id }
-    })
+// Update a User by the id or userId in the request
+exports.update = (req, res) => {
+    const { id } = req.params;
+    let condition;
+    if (id > 0) {
+        condition = { where: { id: id } };
+    } else {
+        condition = { where: { userId: req.body.userId } };
+    }
+
+    Employee.update(req.body, condition)
         .then(num => {
             if (num == 1) {
                 res.send({
@@ -86,7 +91,7 @@ exports.update = (req, res) => {
             }
         })
         .catch(err => {
-            console.log(err)
+            console.log(err);
             res.status(500).send({
                 message: "Error updating User with id=" + id
             });

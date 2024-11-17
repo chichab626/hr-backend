@@ -79,6 +79,7 @@ exports.bulkHireAndWithdraw = async (req, res) => {
                     transaction
                 }
             );
+
         }));
 
         // Commit the transaction if everything is successful
