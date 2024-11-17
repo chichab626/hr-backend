@@ -20,7 +20,8 @@ exports.create = (req, res) => {
     location: req.body.location,
     phone: req.body.phone,
     profileSummary: req.body.profileSummary,
-    experiences: req.body.experiences
+    experiences: req.body.experiences,
+    resume: req.body.resume
   };
 
   // Save Candidate in the database
