@@ -123,7 +123,7 @@ exports.update = (req, res) => {
       if (num == 1) {
         res.send({
           message: "Candidate was updated successfully."
-        });y
+        });
       } else {
         res.send({
           message: `Cannot update Candidate with id=${id}. Maybe Candidate was not found or req.body is empty!`
