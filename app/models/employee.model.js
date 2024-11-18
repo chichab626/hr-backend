@@ -37,6 +37,11 @@ module.exports = (sequelize, Sequelize) => {
             },
             allowNull: true                // This field is optional
         },
+        ratings: {
+            type: Sequelize.ARRAY(Sequelize.JSONB), // Store an array of JSONB objects
+            allowNull: true,         // Optional, ratings are not required initially
+            defaultValue: []         // Default value as an empty array if no ratings
+        },
         createdAt: {
             type: Sequelize.DATE,          // Maps to TIMESTAMP WITH TIME ZONE in PostgreSQL
             defaultValue: Sequelize.NOW    // Default value set to current date and time

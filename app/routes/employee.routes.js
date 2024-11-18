@@ -23,6 +23,10 @@ module.exports = app => {
 
   // Delete all employee
   router.delete("/", employee.deleteAll);
+  router.get("/ratings/:id", employee.findRatingsByEmployeeId);
+  router.put("/ratings/:id", employee.updateRating);
+  router.post("/ratings", employee.createRating);
+  router.delete("/ratings/:id", employee.deleteRating);
 
   app.use("/api/employee", router);
 };

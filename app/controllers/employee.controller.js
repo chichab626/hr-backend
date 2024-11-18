@@ -153,3 +153,160 @@ exports.findAllPublished = (req, res) => {
             });
         });
 };
+
+// Create and Save a new Rating for an Employee
+exports.createRating = (req, res) => {
+    const { score, reviewerId, comments, employeeId } = req.body;
+
+    // Validate request
+    if (!score || !reviewerId || !employeeId) {
+        res.status(400).send({
+            message: "Rating score, reviewerId, and employeeId cannot be empty!"
+        });
+        return;
+    }
+
+    // Find the employee by ID
+    Employee.findByPk(employeeId)
+        .then(employee => {
+            if (!employee) {
+                return res.status(404).send({
+                    message: "Employee not found!"
+                });
+            }
+
+            // Create the rating object
+            const newRating = {
+                score,
+                reviewerId,
+                comments,
+                createdAt: new Date(),
+            };
+
+            // Add the new rating to the employee's ratings array
+            employee.ratings = [...employee.ratings, newRating]; // Ensure ratings is an array
+            //employee.ratings.push(newRating);
+
+            // Save the updated employee record
+            employee.save()
+                .then(updatedEmployee => {
+                    res.send(updatedEmployee.ratings);
+                    
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        message: err.message || "Some error occurred while saving the rating."
+                    });
+                });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while finding the employee."
+            });
+        });
+};
+
+// Retrieve all ratings for a specific employee
+exports.findRatingsByEmployeeId = (req, res) => {
+    const id = req.params.id;
+
+    // Find the employee by ID
+    Employee.findByPk(id)
+        .then(employee => {
+            if (!employee) {
+                return res.status(404).send({
+                    message: "Employee not found!"
+                });
+            }
+
+            // Send back the ratings array
+            res.send(employee.ratings || []);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving ratings."
+            });
+        });
+};
+
+// Update a rating by index in the ratings array
+exports.updateRating = (req, res) => {
+    const { id } = req.params;
+    const { ratings } = req.body;
+
+    // Find the employee by ID
+    Employee.findByPk(id)
+        .then(employee => {
+            if (!employee) {
+                return res.status(404).send({
+                    message: "Employee not found!"
+                });
+            }
+
+            employee.ratings = ratings;
+            // Save the updated employee record
+            employee.save()
+                .then(updatedEmployee => {
+                    res.send(updatedEmployee.ratings);
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        message: err.message || "Some error occurred while updating the rating."
+                    });
+                });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while finding the employee."
+            });
+        });
+};
+
+// Delete a rating by index in the ratings array
+exports.deleteRating = (req, res) => {
+    const { employeeId, ratingIndex } = req.params;
+
+    // Validate request
+    if (ratingIndex === undefined) {
+        return res.status(400).send({
+            message: "Rating index cannot be empty!"
+        });
+    }
+
+    // Find the employee by ID
+    Employee.findByPk(employeeId)
+        .then(employee => {
+            if (!employee) {
+                return res.status(404).send({
+                    message: "Employee not found!"
+                });
+            }
+
+            // Ensure the rating index exists
+            const rating = employee.ratings[ratingIndex];
+            if (!rating) {
+                return res.status(404).send({
+                    message: "Rating not found at this index!"
+                });
+            }
+
+            // Remove the rating from the array
+            employee.ratings.splice(ratingIndex, 1);
+
+            // Save the updated employee record
+            employee.save()
+                .then(updatedEmployee => {
+                    res.send(updatedEmployee);
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        message: err.message || "Some error occurred while deleting the rating."
+                    });
+                });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while finding the employee."
+            });
+        });
+};
