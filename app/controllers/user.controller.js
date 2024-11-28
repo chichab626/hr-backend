@@ -2,16 +2,16 @@ const db = require("../models");
 const User = db.users;
 const Employee = db.employees;
 const Candidate = db.candidates;
-const Checklist = db.checklist
+const Checklist = db.checklist;
 const Op = db.Sequelize.Op;
-const sequelize = db.sequelize
+const sequelize = db.sequelize;
 
 // Create and Save a new User
 exports.create = async (req, res) => {
 
     const {
         email, password, role,
-        name, jobTitle, location, salary, reportsTo, externalEmail, candidateId, jobId
+        name, jobTitle, location, salary, reportsTo, externalEmail, candidateId, jobId, phone
     } = req.body;
 
     // Validate request
@@ -23,57 +23,69 @@ exports.create = async (req, res) => {
     }
 
     try {
-        let candidate, employee, user, checklist = {}
+        let candidate, employee, user, checklist = {};
         await sequelize.transaction(async (t) => {
-          user = await User.create(
-            { email, password, role },
-            { transaction: t }
-          );
-
-          if (role == 'Employee') {
-            if (!name || !jobTitle || !location || !user.id || !email) {
-                res.status(400).send({
-                    message: "Employee userId, name, title, location Content cannot be empty!"
-                });
-                return;
-            }
-            employee = await Employee.create(
-                {
-                    userId : user.id, name, email, jobTitle, location, 
-                    ... (salary && { salary } ),
-                    ... (reportsTo && { reportsTo } ),
-                },
+            user = await User.create(
+                { email, password, role },
                 { transaction: t }
-              );
-            
-          }
+            );
 
-          if (candidateId && externalEmail) {           
+            if (role == 'Employee') {
+                if (!name || !jobTitle || !location || !user.id || !email) {
+                    res.status(400).send({
+                        message: "Employee userId, name, title, location Content cannot be empty!"
+                    });
+                    return;
+                }
+                employee = await Employee.create(
+                    {
+                        userId: user.id, name, email, jobTitle, location,
+                        ... (salary && { salary }),
+                        ... (reportsTo && { reportsTo }),
+                    },
+                    { transaction: t }
+                );
 
-            checklist = await Checklist.create( {
-                employeeId : employee.id, 
-                jobId: jobId,
-                status: 'Added',
-                hireDate:  new Date(),
-            },
-            { transaction: t })
-        };
-    
+                if (candidateId && externalEmail) {
+
+                    checklist = await Checklist.create({
+                        employeeId: employee.id,
+                        jobId: jobId,
+                        status: 'Added',
+                        hireDate: new Date(),
+                    },
+                        { transaction: t });
+                }
+
+                if (candidateId && externalEmail) {
+                    candidate = await Candidate.update({ status: "Employee", userId: user.id, email: email }, { where: { id: candidateId } });
+        
+                };
+
+            } else if (role == 'Guest') {
+                const data = {
+                    userId: user.id,
+                    name: name,
+                    externalEmail: email,
+                    email: email,
+                    location: location,
+                    phone: phone
+                  };
+
+                candidate = await Candidate.upsert(data, { transaction: t });
+            }
         });
 
-        if (candidateId && externalEmail) {
-            candidate = await Candidate.update( { status : "Employee", userId: user.id, email: email}, {  where: { id :  candidateId} })
 
-        };
-    
+
         console.log('Transaction has been committed!');
-        res.send({ user, employee, candidate, checklist})
-      } catch (err) {
+        res.send({ user, employee, candidate, checklist });
+    } catch (err) {
         res.status(500).send({
-            message: err.parent?.detail || err.message ||  "Transaction failed and has been rolled back"
+            message: err.parent?.detail || err.message || "Transaction failed and has been rolled back"
         });
         console.error('Transaction failed and has been rolled back:', err);
-      }
+    }
 };
 
 // exports.create = (req, res) => {

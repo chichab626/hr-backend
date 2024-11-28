@@ -26,6 +26,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             defaultValue: 1
         },
+        jobType: {
+            type: Sequelize.ENUM('Internal', 'External', 'Both'), // Status of the candidate's application
+            defaultValue: 'Both',
+            allowNull: false
+        },
         hiringManagerId: {
             type: Sequelize.INTEGER, // Treference the Employee model by its primary key 
             allowNull: false,
