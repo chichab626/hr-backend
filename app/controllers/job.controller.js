@@ -13,7 +13,8 @@ exports.create = (req, res) => {
         salary,
         openPositions,
         jobDescription,
-        hiringManagerId
+        hiringManagerId,
+        jobType
     } = req.body;
 
     // Validate request
@@ -31,7 +32,8 @@ exports.create = (req, res) => {
         salary: salary,
         location,
         openPositions,
-        hiringManagerId
+        hiringManagerId,
+        jobType
     };
 
     // Save job in the database

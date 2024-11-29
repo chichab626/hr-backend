@@ -36,6 +36,9 @@ exports.login = async (req, res) => {
         result.employeeId = employee.id;
         result.candidate = candidate || {};
         result.employee = employee || {};
+    } else if (user.role == 'Guest') {
+        candidate = await Candidate.findOne({ where: { userId: user.id } });
+        result.candidate = candidate || {};
     }
 
     const role = (user.role == 'Employee' && employee?.jobTitle?.includes('Manager')) ? 'Manager' : user.role

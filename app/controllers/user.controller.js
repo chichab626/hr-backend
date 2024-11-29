@@ -58,7 +58,10 @@ exports.create = async (req, res) => {
                 }
 
                 if (candidateId && externalEmail) {
-                    candidate = await Candidate.update({ status: "Employee", userId: user.id, email: email }, { where: { id: candidateId } });
+                    candidate = await Candidate.update(
+                        { status: "Employee", userId: user.id, email, externalEmail },
+                        { where: { id: candidateId }, transaction: t }
+                    );
         
                 };
 
