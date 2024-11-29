@@ -34,9 +34,11 @@ db.checklist = require("./checklist.model.js")(sequelize, Sequelize);
 db.letter = require("./letter.model.js")(sequelize, Sequelize);
 
 db.jobs.hasMany(db.jobApplicants, { foreignKey: 'jobId', as: 'jobApplicant' });
-db.jobApplicants.associate({Candidate:db.candidates, Job:db.jobs})
+db.jobApplicants.belongsTo(db.candidates, { foreignKey: 'candidateId', as: 'candidate' });
+db.jobApplicants.belongsTo(db.jobs, { foreignKey: 'jobId', as: 'job' });
 
 db.employees.hasMany(db.checklist, { foreignKey: 'employeeId', as: 'checklist' })
 db.checklist.belongsTo(db.employees, { foreignKey: 'employeeId', as: 'employee'})
+
 
 module.exports = db;

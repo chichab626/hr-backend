@@ -22,21 +22,35 @@ exports.create = async (req, res) => {
         return;
     }
 
+    let isGuestToEmp = false;
+    let guestUser = null
+    if (externalEmail) {
+        guestUser = await User.findOne({ where: { email: externalEmail } })
+        isGuestToEmp = email !== externalEmail && guestUser && role === 'Employee' && guestUser.role === 'Guest'
+    }
+
     try {
         let candidate, employee, user, checklist = {};
         await sequelize.transaction(async (t) => {
-            user = await User.create(
-                { email, password, role },
-                { transaction: t }
-            );
+            if (isGuestToEmp) {
+                // update the guest account instead of creating a new user account
+                user = await User.update(
+                    { email, password, role },
+                    { where: { id: guestUser.id }, transaction: t }
+                );
+            } else {
+                user = await User.create(
+                    { email, password, role },
+                    { transaction: t }
+                );
+            }
+            
 
             if (role == 'Employee') {
                 if (!name || !jobTitle || !location || !user.id || !email) {
-                    res.status(400).send({
-                        message: "Employee userId, name, title, location Content cannot be empty!"
-                    });
-                    return;
+                    throw new Error("Employee userId, name, title, location Content cannot be empty!");
                 }
+                
                 employee = await Employee.create(
                     {
                         userId: user.id, name, email, jobTitle, location,
@@ -121,8 +135,8 @@ exports.create = async (req, res) => {
 
 // Retrieve all Users from the database.
 exports.findAll = (req, res) => {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
+    const email = req.query.title;
+    var condition = email ? { email: { [Op.iLike]: `%${email}%` } } : null;
 
     User.findAll({ where: condition })
         .then(data => {

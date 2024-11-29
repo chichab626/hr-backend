@@ -42,11 +42,5 @@ module.exports = (sequelize, Sequelize) => {
         ]
     });
 
-    // Define associations
-    JobApplicant.associate = (models) => {
-        JobApplicant.belongsTo(models.Candidate, { foreignKey: 'candidateId', as: 'candidate' });
-        JobApplicant.belongsTo(models.Job, { foreignKey: 'jobId', as: 'job' });
-    };
-
     return JobApplicant;
 };
